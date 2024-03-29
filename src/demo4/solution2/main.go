@@ -1,10 +1,12 @@
 package main
 
-import "time"
+import (
+	"time"
+)
 
 var allNumber chan int = make(chan int, 10000)
 
-var goroutineNumber int = 10000
+var goroutineNumber int = 100000
 
 func initData(num int) {
 	for i := 1; i <= num; i++ {
@@ -16,7 +18,12 @@ func initData(num int) {
 
 func handleNumber(allNumber chan int, primeNumber chan int, exitChan chan bool) {
 
-	for n := range allNumber {
+	for {
+		n, ok := <-allNumber
+		if !ok {
+			// 数据取完了
+			break
+		}
 		time.Sleep(time.Microsecond)
 		if n <= 1 {
 			continue
@@ -37,7 +44,6 @@ func main() {
 	primeNumber := make(chan int, 10000)
 
 	exitChan := make(chan bool, goroutineNumber)
-
 	go initData(100000)
 
 	for i := 0; i < goroutineNumber; i++ {
