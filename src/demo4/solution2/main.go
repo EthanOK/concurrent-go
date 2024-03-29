@@ -16,7 +16,13 @@ func initData(num int) {
 
 }
 
-func handleNumber(allNumber chan int, primeNumber chan int, exitChan chan bool) {
+func handleNumber(allNumber <-chan int, primeNumber chan<- int, exitChan chan<- bool) {
+	/*
+		优化:
+		allNumber 只读通道
+		primeNumber 只写通道
+		exitChan 只写通道
+	*/
 
 	for {
 		n, ok := <-allNumber
@@ -44,6 +50,7 @@ func main() {
 	primeNumber := make(chan int, 10000)
 
 	exitChan := make(chan bool, goroutineNumber)
+
 	go initData(100000)
 
 	for i := 0; i < goroutineNumber; i++ {
